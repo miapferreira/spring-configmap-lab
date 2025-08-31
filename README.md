@@ -60,8 +60,8 @@ docker build -t spring-configmap-lab:0.0.1 .
 
 ### Se usar kind
 ```bash
-kind create cluster --name michel-test-cluster    # se ainda não existir
-kind load docker-image spring-configmap-lab:0.0.1 --name michel-test-cluster
+kind create cluster --name demo-cluster    # se ainda não existir
+kind load docker-image spring-configmap-lab:0.0.1 --name demo-cluster
 ```
 
 ### Se usar minikube
@@ -72,7 +72,9 @@ minikube image load spring-configmap-lab:0.0.1
 
 ---
 
-## Deploy no Kubernetes (arquivos separados)
+## Deploy no Kubernetes
+
+> **Finalidade**: Este deploy cria um cluster Kubernetes completo com a aplicação Spring Boot, expondo a porta do container para acesso externo através de um Service NodePort.
 
 > Aplique **na ordem**:
 
@@ -82,10 +84,30 @@ kubectl apply -f k8s/10-configmap-app.yaml
 kubectl apply -f k8s/11-configmap-env.yaml
 kubectl apply -f k8s/20-deployment.yaml
 kubectl apply -f k8s/30-service.yaml
+
+# Verificar status dos recursos
+kubectl -n demo-cm get all
+
+# Acompanhar o status dos pods
 kubectl -n demo-cm get pods -w
 ```
 
-Quando o pod estiver `Running`:
+## Finalidade do Deploy
+
+Este deploy cria um cluster Kubernetes completo com:
+
+- **Namespace**: `demo-cm` para isolamento
+- **ConfigMaps**: Para configurações da aplicação e variáveis de ambiente
+- **Deployment**: Para gerenciar os pods da aplicação Spring Boot
+- **Service**: Para expor a aplicação e permitir acesso externo
+
+### Expondo a Porta do Container
+
+O Service `spring-svc` expõe a porta 80 do container através de um NodePort, permitindo acesso externo à aplicação.
+
+---
+
+## Quando o Pod estiver Running
 
 ```bash
 kubectl -n demo-cm port-forward svc/spring-svc 8080:80
