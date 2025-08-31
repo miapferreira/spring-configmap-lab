@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-app
+  namespace: demo-cm
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: spring-app }
+  template:
+    metadata:
+      labels: { app: spring-app }
+      annotations:
+        config.checksum: "v1"   # mude este valor quando alterar os ConfigMaps para forçar rollout
+    spec:
+      containers:
+      - name: app
+        image: spring-configmap-lab:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 8080
+        # Faz o Spring procurar configs extras em /config (onde montamos o CM)
+        args: ["--spring.config.additional-location=file:/config/"]
+        envFrom:
+          - configMapRef:
+              name: env-config
+        volumeMounts:
+          - name: spring-config-vol
+            mountPath: /config
+      volumes:
+        - name: spring-config-vol
+          configMap:
+            name: spring-config
+            items:
+              - key: application.properties
+                path: application.properties

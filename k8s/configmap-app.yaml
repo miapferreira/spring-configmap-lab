@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-config
+  namespace: demo-cm
+data:
+  application.properties: |
+    app.message=Hello from ConfigMap v2 (mudou !)
